@@ -1,42 +1,26 @@
 import * as React from 'react';
+import WebPlayback from './WebPlayback'
 import {createRoot} from 'react-dom/client';
+import './app.css';
+import Login from './Login';
 
-async function addSticky() {
-  const stickyNote = await miro.board.createStickyNote({
-    content: 'Hello, World!',
-  });
-
-  await miro.board.viewport.zoomTo(stickyNote);
-}
 
 const App = () => {
+  const [token, setToken] = React.useState('');
   React.useEffect(() => {
-    addSticky();
+    async function getToken() {
+      const response = await fetch('/auth/token');
+      const json = await response.json();
+      setToken(json.access_token);
+    }
+
+    getToken();
   }, []);
 
   return (
-    <div className="grid wrapper">
-      <div className="cs1 ce12">
-        <img src="/src/assets/congratulations.png" alt="" />
-      </div>
-      <div className="cs1 ce12">
-        <h1>Congratulations!</h1>
-        <p>You've just created your first Miro app!</p>
-        <p>
-          To explore more and build your own app, see the Miro Developer
-          Platform documentation.
-        </p>
-      </div>
-      <div className="cs1 ce12">
-        <a
-          className="button button-primary"
-          target="_blank"
-          href="https://developers.miro.com"
-        >
-          Read the documentation
-        </a>
-      </div>
-    </div>
+    <>
+        { (token === '') ? <Login setToken={setToken}/> : <WebPlayback token={token} /> }
+    </>
   );
 };
 
